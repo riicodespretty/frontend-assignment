@@ -4,19 +4,12 @@ import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
 import ui from '@nuxt/ui/vite'
 import Icons from 'unplugin-icons/vite'
-import IconsResolver from 'unplugin-icons/resolver'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
-    ui({
-      components: {
-        resolvers: [
-          IconsResolver(),
-        ],
-      },
-    }),
+    ui(),
     tailwindcss(),
     Icons({ compiler: 'vue3' }),
   ],

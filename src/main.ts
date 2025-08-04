@@ -10,6 +10,8 @@ import ui from '@nuxt/ui/vue-plugin'
 
 import { createAuth0 } from '@auth0/auth0-vue'
 
+import { createPinia } from 'pinia'
+
 const app = createApp(App)
 
 app.use(VueAnnouncer)
@@ -26,5 +28,7 @@ app.use(
     },
   }),
 )
+
+app.use(createPinia())
 
 app.mount('#app')

@@ -30,7 +30,7 @@
       "age": 37,
       "picture": "http://placehold.it/32x32",
       "registered": "2019-05-19T12:47:34 -09:00",
-      "currency": "Yen",
+      "currency": "JPY",
       "subscriptionCost": "20000.00"
     },
     {
@@ -41,7 +41,7 @@
       "age": 23,
       "picture": "http://placehold.it/32x32",
       "registered": "2014-04-22T07:16:12 -09:00",
-      "currency": "Yen",
+      "currency": "JPY",
       "subscriptionCost": "2000.00"
     },
     {
