@@ -10,6 +10,7 @@ import stylistic from '@stylistic/eslint-plugin'
 import tailwind from 'eslint-plugin-tailwindcss'
 import globals from 'globals'
 import format from 'eslint-plugin-format'
+import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
 
 export default ts.config(
   { ignores: ['**/coverage', '**/dist'] },
@@ -31,10 +32,21 @@ export default ts.config(
         parser: ts.parser,
       },
     },
+    plugins: {
+      'no-relative-import-paths': noRelativeImportPaths,
+    },
     rules: {
       'tailwindcss/no-custom-classname': 'off',
       '@stylistic/object-curly-spacing': 'error',
-      '@typescript-eslint/no-unused-vars': ["error", { "ignoreRestSiblings": true }]
+      '@typescript-eslint/no-unused-vars': ["error", { "ignoreRestSiblings": true }],
+      'no-relative-import-paths/no-relative-import-paths': [
+        "error",
+        {
+          allowSameFolder: false,
+          rootDir: "src",
+          prefix: "@"
+        }
+      ],
     },
     settings: {
       tailwindcss: {

@@ -1,7 +1,7 @@
 import type { ClientSchema } from '@/components/ClientModal.vue'
 import { useFetch } from '@vueuse/core'
 import { useClientStore } from '@/store/client'
-import { toIsoWithOffset } from './timeUtils'
+import { toIsoWithOffset } from '@/composables/timeUtils'
 import type { ConfirmationSchema } from '@/components/ConfirmationModal.vue'
 
 interface HandleResponse<T> {

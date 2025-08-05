@@ -1,8 +1,8 @@
 import { createApp } from 'vue'
-import App from './App.vue'
-import './main.css'
+import App from '@/App.vue'
+import '@/main.css'
 
-import router from './router'
+import router from '@/router'
 import VueAnnouncer from '@vue-a11y/announcer'
 import '@vue-a11y/announcer/dist/style.css'
 

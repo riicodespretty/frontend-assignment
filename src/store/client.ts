@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { usePaginationStore } from './pagination'
+import { usePaginationStore } from '@/store/pagination'
 
 export const useClientStore = defineStore('client', {
   state: () => ({
