@@ -11,7 +11,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import { h, resolveComponent } from 'vue'
 import type { Row, SortingState, VisibilityState } from '@tanstack/table-core'
-import ClientModal from './ClientModal.vue'
+import { showModal } from '@/composables/showModal'
 
 defineProps<{ data: Client[] }>()
 
@@ -116,7 +116,14 @@ function getRowItems(row: Row<Client>) {
       label: 'View details',
       icon: 'i-lucide-user',
       onSelect() {
-        showModal(row.original)
+        const modal = showModal({
+          client: row.original,
+          onSubmit({ name }) {
+            const toast = useToast()
+            toast.add({ title: 'Success', description: 'Information has been updated for client: ' + name, color: 'success' })
+            modal.close()
+          },
+        })
       },
       class: 'cursor-pointer',
     },
@@ -132,10 +139,4 @@ function getRowItems(row: Row<Client>) {
   ]
 }
 
-function showModal(client: Client) {
-  const overlay = useOverlay()
-
-  const modal = overlay.create(h(ClientModal, { client }))
-  modal.open()
-}
 </script>

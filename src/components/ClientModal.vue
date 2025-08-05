@@ -1,12 +1,13 @@
 <template>
   <UModal
-    title="Client Information"
-    description="View or update client information"
+    :title
+    :description
   >
     <template #body>
       <UForm
         :schema="schema"
         :state="state"
+        :validate
         class="space-y-4"
         :disabled="!edit"
         @submit="onSubmit"
@@ -101,19 +102,20 @@
               currencySign: 'accounting'
             }"
             class="w-full"
+            :min="1"
             :variant
           />
         </UFormField>
 
         <div
           class="mt-8 flex w-full"
-          :class="[edit ? 'justify-end' : 'justify-start']"
+          :class="[editState ? 'justify-end' : 'justify-start']"
         >
           <UButton
-            v-if="!edit"
+            v-if="!editState"
             class="cursor-pointer"
             color="info"
-            @click="edit = !edit"
+            @click="editState = !editState"
           >
             Edit
           </UButton>
@@ -133,12 +135,24 @@
 
 <script setup lang="ts">
 import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
+import type { FormError, FormSubmitEvent } from '@nuxt/ui'
 import { computed, ref, toRefs } from 'vue'
 import { toReactive } from '@vueuse/core'
 
-const props = defineProps<{ title?: string, description?: string, client: Client }>()
-const { client } = toRefs(props)
+export interface ClientModalProps {
+  title?: string
+  description?: string
+  client?: Partial<Client>
+  edit?: boolean
+}
+
+const props = withDefaults(defineProps<ClientModalProps>(), {
+  title: 'Client Information',
+  description: 'View or update client information',
+  client: () => ({ currency: 'USD' }),
+  edit: false,
+})
+const { edit, client, title, description } = toRefs(props)
 const state = toReactive(client)
 
 const currencies = ['USD', 'INR', 'JPY', 'CAD', 'SGD'] // Intl.supportedValuesOf('currency')
@@ -155,12 +169,34 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>
 
-const toast = useToast()
-async function onSubmit(event: FormSubmitEvent<Schema>) {
-  toast.add({ title: 'Success', description: 'Information has been updated for client: ' + client.value.name, color: 'success' })
-  console.log(event.data)
+const validate = (state: Partial<{
+  name: string
+  gender: string
+  company: string
+  age: number
+  picture: string
+  currency: string
+  subscriptionCost: unknown
+}>): FormError[] => {
+  const errors = []
+  if (!state.name) errors.push({ name: 'name', message: 'Must not be empty' })
+  if (!state.gender) errors.push({ name: 'gender', message: 'Must not be empty' })
+  if (!state.company) errors.push({ name: 'company', message: 'Must not be empty' })
+  if (!state.age) errors.push({ name: 'age', message: 'Must be at least 18 years old' })
+  if (!state.picture) errors.push({ name: 'picture', message: 'Must not be empty' })
+  if (!state.currency) errors.push({ name: 'currency', message: 'Must be a valid currency' })
+  if (!state.subscriptionCost) errors.push({ name: 'subscriptionCost', message: 'Must be a positive amount' })
+  return errors
 }
 
-const edit = ref(false)
-const variant = computed(() => !edit.value ? 'subtle' : 'outline')
+const emit = defineEmits<{
+  submit: [data: Schema]
+}>()
+
+async function onSubmit(event: FormSubmitEvent<Schema>) {
+  emit('submit', event.data)
+}
+
+const editState = ref(edit.value)
+const variant = computed(() => !editState.value ? 'subtle' : 'outline')
 </script>
