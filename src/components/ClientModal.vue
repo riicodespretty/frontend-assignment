@@ -12,12 +12,29 @@
         :disabled="!editState"
         @submit.prevent="onSubmit"
       >
-        <UInput
-          :model-value="client.id"
-          type="hidden"
-          class="hidden"
-          :variant
-        />
+        <UFormField
+          v-if="client.id"
+          label="ID"
+        >
+          <UInput
+            :model-value="client.id"
+            variant="subtle"
+            class="w-full"
+            readonly
+          />
+        </UFormField>
+
+        <UFormField
+          v-if="client.registered"
+          label="Registered Date"
+        >
+          <UInput
+            :model-value="toLocaleFormattedString(client.registered)"
+            variant="subtle"
+            class="w-full"
+            readonly
+          />
+        </UFormField>
 
         <UFormField
           label="Name"
@@ -146,6 +163,7 @@
 import * as z from 'zod'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
 import { computed, reactive, ref, toRefs } from 'vue'
+import { toLocaleFormattedString } from '@/composables/timeUtils'
 
 export interface ClientModalProps {
   title?: string
@@ -157,7 +175,7 @@ export interface ClientModalProps {
 const props = withDefaults(defineProps<ClientModalProps>(), {
   title: 'Client Information',
   description: 'View or update client information',
-  client: () => ({ id: 'undefined', currency: 'USD' }),
+  client: () => ({ id: '', currency: 'USD' }),
   edit: false,
 })
 const { edit, client, title, description } = toRefs(props)

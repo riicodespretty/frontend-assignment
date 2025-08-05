@@ -21,3 +21,7 @@ export function toIsoWithOffset(date: Date = new Date()): string {
 
   return `${year}-${mo}-${day}T${hr}:${min}:${sec} ${sign}${offH}:${offM}`
 }
+
+export function toLocaleFormattedString(date: string): string {
+  return new Intl.DateTimeFormat(undefined).format(new Date(date.replace(' ', '')))
+}
