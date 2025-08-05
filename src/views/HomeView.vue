@@ -37,9 +37,15 @@ watch(data, (payload) => {
 </script>
 
 <template>
-  <div v-if="error">
-    error
-  </div>
+  <template v-if="error">
+    <UAlert
+      title="An unexpected error has occured"
+      description="Please try again later"
+      icon="i-lucide-triangle-alert"
+      color="warning"
+    />
+  </template>
+
   <template v-else-if="getClientsByPage.length">
     <ClientTable :loading="isFetching" />
     <UPagination
