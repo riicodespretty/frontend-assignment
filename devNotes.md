@@ -6,6 +6,7 @@
 - Implemented guardrails to ensure consistent codestyle using recommended ESLint, Tailwind, Stylistic formatting
 
 ## Design Strategies
+- API responses are cached by page, only fetching for the specific page when the cache misses. 
 - API Calls are handled using `handleResponse()` util to unify toast messages and expected response behaviors
 - Modals are dynamically created and rendered using the `showModal()` util, allowing for compatibility with future created modal components + generic typings for robust logic application with inferred props and emits.
 - Folder structure closely follows conventional industry standard structure, with `@` alias for root dir, disallowing confusing relative import paths with ESLint rules

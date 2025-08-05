@@ -162,8 +162,10 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
-import { computed, reactive, ref, toRefs } from 'vue'
+import { computed, reactive, ref, toRefs, type UnwrapRef } from 'vue'
 import { toLocaleFormattedString } from '@/composables/timeUtils'
+import { useClientStore } from '@/store/client'
+import { storeToRefs } from 'pinia'
 
 export interface ClientModalProps {
   title?: string
@@ -181,20 +183,23 @@ const props = withDefaults(defineProps<ClientModalProps>(), {
 const { edit, client, title, description } = toRefs(props)
 const state = reactive({ ...client.value })
 
-const currencies = ['USD', 'INR', 'JPY', 'CAD', 'SGD'] // Intl.supportedValuesOf('currency')
+const clientStore = useClientStore()
+const { getAllClients } = storeToRefs(clientStore)
+
+const currencies = computed(() => [...new Set(getAllClients.value.map(client => client.currency))]) // Intl.supportedValuesOf('currency')
 const genders = ['male', 'female', 'non-binary']
-const schema = z.object({
+const schema = computed(() => z.object({
   id: z.string(),
   name: z.string().min(1, 'Must not be empty'),
   gender: z.enum(genders),
   company: z.string().min(1, 'Must not be empty'),
   age: z.number().min(18, 'Must be at least 18 years old'),
   picture: z.url(),
-  currency: z.enum(currencies),
+  currency: z.enum(currencies.value),
   subscriptionCost: z.coerce.number().nonnegative(),
-})
+}))
 
-export type ClientSchema = z.output<typeof schema>
+export type ClientSchema = z.output<UnwrapRef<typeof schema>>
 
 const validate = (state: Partial<{
   name: string

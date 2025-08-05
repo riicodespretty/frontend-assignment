@@ -1,25 +1,23 @@
 <template>
   <UTable
+    ref="table"
     :data
     :columns
     :column-visibility
-    :sorting
-    :loading
+    :loading="isFetching"
   />
 </template>
 
 <script setup lang="ts">
 import ClientModal from '@/components/ClientModal.vue'
 import type { TableColumn } from '@nuxt/ui'
-import { h, resolveComponent } from 'vue'
-import type { Row, SortingState, VisibilityState } from '@tanstack/table-core'
+import { h, onMounted, resolveComponent, useTemplateRef } from 'vue'
+import type { Row, VisibilityState } from '@tanstack/table-core'
 import { showModal } from '@/composables/modalUtils'
 import { deleteClient, updateClient } from '@/composables/apiUtils'
 import { useClientStore } from '@/store/client'
 import { storeToRefs } from 'pinia'
 import ConfirmationModal from '@/components/ConfirmationModal.vue'
-
-defineProps<{ loading: boolean }>()
 
 const UAvatar = resolveComponent('UAvatar')
 const UBadge = resolveComponent('UBadge')
@@ -27,21 +25,15 @@ const UButton = resolveComponent('UButton')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
 
 const clientStore = useClientStore()
-const { getClientsByPage: data } = storeToRefs(clientStore)
+const { isFetching, getClientsByCurrentPage: data } = storeToRefs(clientStore)
 
 const columnVisibility: VisibilityState = {
   id: false,
   currency: false,
   registered: false,
 }
-const sorting: SortingState = [
-  {
-    id: 'registered',
-    desc: true,
-  },
-]
 
-const columns: TableColumn<Client>[] = [
+const columns = [
   {
     accessorKey: 'id',
   },
@@ -119,7 +111,24 @@ const columns: TableColumn<Client>[] = [
       )
     },
   },
-]
+] satisfies TableColumn<Client>[]
+
+const table = useTemplateRef('table')
+onMounted(() => {
+  if (!table.value?.tableRef) return
+
+  const colgroup = document.createElement('colgroup')
+  columns.forEach((column) => {
+    if (Object.hasOwn(columnVisibility, column.accessorKey ?? '')) return
+
+    const col = document.createElement('col')
+    col.classList.add('w-64')
+
+    colgroup.appendChild(col)
+  })
+
+  table.value.tableRef.prepend(colgroup)
+})
 
 function getRowItems(row: Row<Client>) {
   return [
