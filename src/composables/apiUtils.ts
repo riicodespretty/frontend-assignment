@@ -45,11 +45,12 @@ export function useApiUrl() {
   return new URL(`${import.meta.env.VITE_JSON_SERVER_ORIGIN}:${import.meta.env.VITE_JSON_SERVER_PORT}${import.meta.env.VITE_JSON_SERVER_ENDPOINT}`)
 }
 
-export async function updateClient(payload: ClientSchema) {
+export async function updateClient({ subscriptionCost, ...payload }: ClientSchema) {
   const apiUrl = useApiUrl().toString() + `/${payload.id}`
   const clientStore = useClientStore()
 
-  const fetch = await useFetch<Client>(apiUrl).patch(payload).json<Client>()
+  const body = { ...payload, subscriptionCost: subscriptionCost.toFixed(2) }
+  const fetch = await useFetch<Client>(apiUrl).patch(body).json<Client>()
 
   return handleResponse('update', {
     fetch,
