@@ -4,23 +4,33 @@
     :columns
     :column-visibility
     :sorting
+    :loading
   />
 </template>
 
 <script setup lang="ts">
+import ClientModal from '@/components/ClientModal.vue'
 import type { TableColumn } from '@nuxt/ui'
 import { h, resolveComponent } from 'vue'
 import type { Row, SortingState, VisibilityState } from '@tanstack/table-core'
 import { showModal } from '@/composables/showModal'
+import { deleteClient, updateClient } from '@/composables/apiCalls'
+import { useClientStore } from '@/store/client'
+import { storeToRefs } from 'pinia'
+import ConfirmationModal from '@/components/ConfirmationModal.vue'
 
-defineProps<{ data: Client[] }>()
+defineProps<{ loading: boolean }>()
 
 const UAvatar = resolveComponent('UAvatar')
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
 
+const clientStore = useClientStore()
+const { getClientsByPage: data } = storeToRefs(clientStore)
+
 const columnVisibility: VisibilityState = {
+  id: false,
   currency: false,
   registered: false,
 }
@@ -32,6 +42,9 @@ const sorting: SortingState = [
 ]
 
 const columns: TableColumn<Client>[] = [
+  {
+    accessorKey: 'id',
+  },
   {
     accessorKey: 'picture',
     header: '',
@@ -53,11 +66,9 @@ const columns: TableColumn<Client>[] = [
   },
   {
     accessorKey: 'currency',
-    header: 'Currency',
   },
   {
     accessorKey: 'registered',
-    header: 'Registered',
   },
   {
     accessorKey: 'subscriptionCost',
@@ -115,26 +126,34 @@ function getRowItems(row: Row<Client>) {
     {
       label: 'View details',
       icon: 'i-lucide-user',
+      class: 'cursor-pointer',
       onSelect() {
-        const modal = showModal({
+        const modal = showModal(ClientModal, {
           client: row.original,
-          onSubmit({ name }) {
-            const toast = useToast()
-            toast.add({ title: 'Success', description: 'Information has been updated for client: ' + name, color: 'success' })
+          onSubmit: async (data) => {
+            await updateClient(data)
             modal.close()
           },
         })
       },
-      class: 'cursor-pointer',
     },
     {
       type: 'separator',
     },
     {
-      label: 'Delete data',
+      label: 'Delete client',
       color: 'error',
       icon: 'i-lucide-trash-2',
       class: 'cursor-pointer',
+      onSelect() {
+        const modal = showModal(ConfirmationModal, {
+          client: row.original,
+          onSubmit: async (data) => {
+            await deleteClient(data)
+            modal.close()
+          },
+        })
+      },
     },
   ]
 }

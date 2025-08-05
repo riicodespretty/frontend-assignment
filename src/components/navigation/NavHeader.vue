@@ -3,15 +3,17 @@
     variant="pill"
     orientation="horizontal"
     :items
-    class="border-default px-6 data-[orientation=horizontal]:w-full data-[orientation=horizontal]:border-b data-[orientation=vertical]:w-48"
+    class="border-default px-4 data-[orientation=horizontal]:w-full data-[orientation=horizontal]:border-b data-[orientation=vertical]:w-48"
   />
 </template>
 
 <script setup lang="ts">
+import { createClient } from '@/composables/apiCalls'
 import { showModal } from '@/composables/showModal'
 import { useAuth0 } from '@auth0/auth0-vue'
 import type { NavigationMenuItem } from '@nuxt/ui'
 import { ref } from 'vue'
+import ClientModal from '@/components/ClientModal.vue'
 
 const { logout } = useAuth0()
 
@@ -23,7 +25,13 @@ const items = ref<NavigationMenuItem[][]>([
       class: 'cursor-pointer',
       active: true,
       onSelect() {
-        showModal({ edit: true })
+        const modal = showModal(ClientModal, {
+          edit: true,
+          onSubmit: async (data) => {
+            await createClient(data)
+            modal.close()
+          },
+        })
       },
     },
   ],

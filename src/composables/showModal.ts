@@ -1,11 +1,10 @@
-import { h } from 'vue'
-import ClientModal from '@/components/ClientModal.vue'
+import { h, type Component } from 'vue'
 import type { ComponentProps } from 'vue-component-type-helpers'
 
-export function showModal(props: ComponentProps<typeof ClientModal>) {
+export function showModal<P extends Component>(component: P, props: ComponentProps<typeof component>) {
   const overlay = useOverlay()
 
-  const modal = overlay.create(h(ClientModal, props))
+  const modal = overlay.create(h(component, props))
   modal.open()
 
   return modal

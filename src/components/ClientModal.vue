@@ -9,9 +9,16 @@
         :state="state"
         :validate
         class="space-y-4"
-        :disabled="!edit"
-        @submit="onSubmit"
+        :disabled="!editState"
+        @submit.prevent="onSubmit"
       >
+        <UInput
+          :model-value="client.id"
+          type="hidden"
+          class="hidden"
+          :variant
+        />
+
         <UFormField
           label="Name"
           name="name"
@@ -43,9 +50,10 @@
           required
         >
           <UInput
-            v-model="state.company"
-            class="w-full"
+            :model-value="state.company"
+            class="w-full uppercase"
             :variant
+            @update:model-value="state.company = $event.toUpperCase()"
           />
         </UFormField>
 
@@ -93,7 +101,7 @@
           required
         >
           <UInputNumber
-            v-model.number="(state.subscriptionCost as unknown as number)"
+            :model-value="Number(state.subscriptionCost)"
             orientation="vertical"
             :format-options="{
               style: 'currency',
@@ -104,6 +112,7 @@
             class="w-full"
             :min="1"
             :variant
+            @update:model-value="state.subscriptionCost = $event.toFixed(2)"
           />
         </UFormField>
 
@@ -136,8 +145,7 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
-import { computed, ref, toRefs } from 'vue'
-import { toReactive } from '@vueuse/core'
+import { computed, reactive, ref, toRefs } from 'vue'
 
 export interface ClientModalProps {
   title?: string
@@ -149,15 +157,16 @@ export interface ClientModalProps {
 const props = withDefaults(defineProps<ClientModalProps>(), {
   title: 'Client Information',
   description: 'View or update client information',
-  client: () => ({ currency: 'USD' }),
+  client: () => ({ id: 'undefined', currency: 'USD' }),
   edit: false,
 })
 const { edit, client, title, description } = toRefs(props)
-const state = toReactive(client)
+const state = reactive({ ...client.value })
 
 const currencies = ['USD', 'INR', 'JPY', 'CAD', 'SGD'] // Intl.supportedValuesOf('currency')
 const genders = ['male', 'female', 'non-binary']
 const schema = z.object({
+  id: z.string(),
   name: z.string().min(1, 'Must not be empty'),
   gender: z.enum(genders),
   company: z.string().min(1, 'Must not be empty'),
@@ -167,7 +176,7 @@ const schema = z.object({
   subscriptionCost: z.coerce.number().nonnegative(),
 })
 
-type Schema = z.output<typeof schema>
+export type ClientSchema = z.output<typeof schema>
 
 const validate = (state: Partial<{
   name: string
@@ -190,10 +199,10 @@ const validate = (state: Partial<{
 }
 
 const emit = defineEmits<{
-  submit: [data: Schema]
+  submit: [data: ClientSchema]
 }>()
 
-async function onSubmit(event: FormSubmitEvent<Schema>) {
+async function onSubmit(event: FormSubmitEvent<ClientSchema>) {
   emit('submit', event.data)
 }
 

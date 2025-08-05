@@ -34,6 +34,7 @@ export default ts.config(
     rules: {
       'tailwindcss/no-custom-classname': 'off',
       '@stylistic/object-curly-spacing': 'error',
+      '@typescript-eslint/no-unused-vars': ["error", { "ignoreRestSiblings": true }]
     },
     settings: {
       tailwindcss: {
