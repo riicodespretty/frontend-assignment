@@ -7,7 +7,8 @@ export const usePaginationStore = defineStore('pagination', {
   }),
 
   getters: {
-    getPaginationParams: state => ({ page: state.page.toString(), per_page: state.per_page.toString() }),
+    getCurrentPage: state => state.page,
+    getCurrentPageSize: state => state.per_page,
   },
 
   actions: {

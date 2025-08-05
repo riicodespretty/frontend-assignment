@@ -7,23 +7,23 @@ import { useApiUrl } from '@/composables/apiUtils'
 import { useClientStore } from '@/store/client'
 
 const paginationStore = usePaginationStore()
-const { getPaginationParams, page } = storeToRefs(paginationStore)
+const { getCurrentPage, getCurrentPageSize } = storeToRefs(paginationStore)
 
 const apiUrl = computed(() => {
   const url = useApiUrl()
-  const { page: _page, per_page: _per_page } = getPaginationParams.value
-  const params = new URLSearchParams({ _page, _per_page })
+  const [_page, _limit] = [getCurrentPage.value.toString(), getCurrentPageSize.value.toString()]
+  const params = new URLSearchParams({ _page, _limit })
   url.search = params.toString()
   return url.toString()
 })
 
-const totalPages = ref(page.value)
 const { isFetching, error, data, onFetchResponse } = useFetch(apiUrl, {
   refetch: true,
 }).get().json<Client[]>()
 
+const totalItems = ref(getCurrentPage.value)
 onFetchResponse((response) => {
-  totalPages.value = Number(response.headers.get('X-Total-Count'))
+  totalItems.value = Number(response.headers.get('X-Total-Count'))
 })
 
 const clientStore = useClientStore()
@@ -43,8 +43,9 @@ watch(data, (payload) => {
   <template v-else-if="getClientsByPage.length">
     <ClientTable :loading="isFetching" />
     <UPagination
-      :page="page"
-      :total="totalPages"
+      :page="getCurrentPage"
+      :items-per-page="getCurrentPageSize"
+      :total="totalItems"
       class="flex w-full items-center justify-center"
       @update:page="paginationStore.updatePage($event)"
     />
