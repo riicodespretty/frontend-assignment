@@ -1,8 +1,7 @@
 import type { ClientSchema } from '@/components/ClientModal.vue'
-import { useApiUrl } from './useApiUrl'
 import { useFetch } from '@vueuse/core'
 import { useClientStore } from '@/store/client'
-import { toIsoWithOffset } from './toIsoWithOffset'
+import { toIsoWithOffset } from './timeUtils'
 import type { ConfirmationSchema } from '@/components/ConfirmationModal.vue'
 
 interface HandleResponse<T> {
@@ -40,6 +39,10 @@ function handleResponse(
   }
 
   return fetch
+}
+
+export function useApiUrl() {
+  return new URL(`${import.meta.env.VITE_JSON_SERVER_ORIGIN}:${import.meta.env.VITE_JSON_SERVER_PORT}${import.meta.env.VITE_JSON_SERVER_ENDPOINT}`)
 }
 
 export async function updateClient(payload: ClientSchema) {

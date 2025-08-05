@@ -8,8 +8,8 @@
 </template>
 
 <script setup lang="ts">
-import { createClient } from '@/composables/apiCalls'
-import { showModal } from '@/composables/showModal'
+import { createClient } from '@/composables/apiUtils'
+import { showModal } from '@/composables/modalUtils'
 import { useAuth0 } from '@auth0/auth0-vue'
 import type { NavigationMenuItem } from '@nuxt/ui'
 import { ref } from 'vue'

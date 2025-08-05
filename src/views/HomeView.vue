@@ -3,7 +3,7 @@ import { useFetch } from '@vueuse/core'
 import { usePaginationStore } from '@/store/pagination'
 import { storeToRefs } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import { useApiUrl } from '@/composables/useApiUrl'
+import { useApiUrl } from '@/composables/apiUtils'
 import { useClientStore } from '@/store/client'
 
 const paginationStore = usePaginationStore()
