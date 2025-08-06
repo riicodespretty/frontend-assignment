@@ -32,7 +32,7 @@ export const usePaginationStore = defineStore('pagination', {
     },
 
     previous() {
-      this.page = Math.min(0, this.page - 1)
+      this.page = Math.min(1, this.page - 1)
     },
   },
 })

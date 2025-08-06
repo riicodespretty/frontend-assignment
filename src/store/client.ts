@@ -22,7 +22,7 @@ export const useClientStore = defineStore('client', () => {
 
   const fetchClientById = (id: string) => getAllClients.value.find(client => client.id === id)
   const fetchClientsByPage = (page = 1) => {
-    if (clients.value[page]?.length > 0) return // cache hit
+    if (clients.value[page]?.length === getCurrentPageSize.value) return // cache hit
 
     const apiUrl = getPaginatedApiUrl.value
 
@@ -87,8 +87,14 @@ export const useClientStore = defineStore('client', () => {
       totalClients.value = totalClients.value - 1
     }
 
-    if (!getClientsByCurrentPage.value.length) {
-      paginationStore.updatePage(getCurrentPage.value - 1)
+    if (getClientsByCurrentPage.value.length === 0) {
+      if (getCurrentPage.value > 1)
+        paginationStore.previous()
+      else
+        paginationStore.next()
+    }
+    else if (getClientsByCurrentPage.value.length !== getCurrentPageSize.value) {
+      fetchClientsByPage(getCurrentPage.value)
     }
   }
 

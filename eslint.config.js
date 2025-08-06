@@ -15,7 +15,7 @@ import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
 export default ts.config(
   { ignores: ['**/coverage', '**/dist'] },
   {
-    files: ['**/*.{ts,vue}'],
+    files: ['{test,src}/**/*.{ts,vue}'],
     extends: [
       js.configs.recommended,
       ...ts.configs.recommended,
